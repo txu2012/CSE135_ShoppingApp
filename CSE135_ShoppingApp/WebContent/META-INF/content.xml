@@ -8,9 +8,9 @@
     maxIdle="30"
     maxWaitMillis="10000"
     driverClassName="org.postgresql.Driver"
-    url="jdbc:postgresql://127.0.0.1:5432/cse135db"
+    url="jdbc:postgresql://localhost:5432/CSE135_ShoppingApp"
     username="postgres"
-    password="Shreyas@ps123"
+    password="admin"
 />
 
 </Context>
