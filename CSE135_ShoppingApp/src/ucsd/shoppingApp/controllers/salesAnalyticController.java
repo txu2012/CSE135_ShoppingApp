@@ -28,34 +28,49 @@ import ucsd.shoppingApp.models.ShoppingCartModel;
 /**
  * Servlet implementation class salesAnalyticController
  */
-@WebServlet("/salesAnalyticController")
+//@WebServlet("/src/ucsd/shoppingApp/controllers/salesAnalyticController")
 public class salesAnalyticController extends HttpServlet {
 	//private static final long serialVersionUID = 1L;
       
-	private Connection con = null;
-	
-	private static int rowNum;
-	private static int colNum;
+	private Connection con;
+	private static final long serialVersionUID = 1243242L;
+	private static int rowNum = 0;
+	private static int colNum = 0;
 	private static String orderType;
 	private static String viewing;
 	private static String orderOption;
-	private final static String GetStates = "SELECT state_name FROM state ORDER BY " + orderType + "LIMIT 20 OFFSET " + rowNum; 
+	private final static String GetStates = "SELECT state_name FROM state ORDER BY " + orderType; //+ "LIMIT 20 OFFSET " + rowNum
 	private final static String GetProducts = "SELECT product_name FROM product ORDER BY product_name LIMIT 20 OFFSET " + colNum;
 	private final static String GetPersons = "SELECT person_name FROM person ORDER BY " + orderType + "LIMIT 20 OFFSET " + rowNum;
 	
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public salesAnalyticController(Connection con) {
-        this.con = con;
+    //public salesAnalyticController(Connection con) {
+    //    this.con = con;
         // TODO Auto-generated constructor stub
-    }
+    //}
 
+	public void init() {
+		con = ConnectionManager.getConnection();
+	}
+	
+	public void destroy() {
+		if (con != null) {
+			try {
+				con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		response.setContentType("text/html");
 		viewing = request.getParameter("viewing");
 		orderOption = request.getParameter("order");
 		if(orderOption != null && orderOption.equals("alpha")){
@@ -70,7 +85,7 @@ public class salesAnalyticController extends HttpServlet {
 		
 		request.setAttribute("rows", rowList);
 		request.setAttribute("cols", colList);
-		request.getRequestDispatcher("/salesAnalytics.jsp").forward(request, response);
+		this.getServletContext().getRequestDispatcher("/salesAnalytics.jsp").forward(request, response);
 	}
 
 	/**
@@ -78,27 +93,29 @@ public class salesAnalyticController extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		response.setContentType("text/html");
 		viewing = request.getParameter("viewing");
 		orderOption = request.getParameter("order");
-		if(orderOption != null && orderOption.equals("alpha")){
-			orderType = "person_name";
-		}
-		else if(orderOption != null && orderOption.equals("topk")){
-			orderType = "price";
-		}
 		
 		ArrayList<String> rowList = getRows();
 		ArrayList<String> colList = getCols();
 		
 		request.setAttribute("rows", rowList);
 		request.setAttribute("cols", colList);
-		request.getRequestDispatcher("/salesAnalytics.jsp").forward(request, response);
+		this.getServletContext().getRequestDispatcher("/salesAnalytics.jsp").forward(request, response);
 		
 	}
 	
 	private ArrayList<String> getRows(){
 		if(viewing != null && viewing.equals("state")){
-			
+			if(orderOption != null && orderOption.equals("alpha")){
+				orderType = "state_name";
+				
+			}
+			else if(orderOption != null && orderOption.equals("topk")){
+				orderType = "price";
+			}
+			System.out.println(orderType);
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
 			
@@ -109,6 +126,7 @@ public class salesAnalyticController extends HttpServlet {
 				ArrayList<String> states = new ArrayList<String>();
 				while(rs.next()){
 					states.add(rs.getString("state_name"));
+					System.out.println("test");
 				}
 				
 				if(!states.isEmpty()){
@@ -138,6 +156,15 @@ public class salesAnalyticController extends HttpServlet {
 			
 		}
 		else if(viewing != null && viewing.equals("person")){
+			if(orderOption != null && orderOption.equals("alpha")){
+				orderType = "person_name";
+				
+			}
+			else if(orderOption != null && orderOption.equals("topk")){
+				orderType = "price";
+			}
+			
+			System.out.println(orderType);
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
 			
