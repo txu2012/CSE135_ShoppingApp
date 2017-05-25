@@ -37,25 +37,26 @@
 		</form>
 		<% 
 			ArrayList<String> rows = new ArrayList<String>();
-			if(request.getAttribute("products") != null) 
+			if(request.getAttribute("rows") != null) {
 				rows = (ArrayList<String>) request.getAttribute("rows");
+				System.out.println(rows);
 		%>
 		<table border="1">
 			<tr>
 				<td></td>
-				<% 
-					if (rows.size()>0) {
+			</tr>
+			<% 
+
 						for(String s : rows){
 							System.out.println(s);
 				%>
 					
-						<td><%= s %></td>
+						<tr><td><%= s %></td></tr>
 					
 				<%
 						}
 					}
 				%>
-			</tr>
 		</table>
 		
 		<%

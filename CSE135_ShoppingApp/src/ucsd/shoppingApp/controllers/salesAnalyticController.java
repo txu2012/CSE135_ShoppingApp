@@ -7,10 +7,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -39,9 +41,9 @@ public class salesAnalyticController extends HttpServlet {
 	private static String orderType;
 	private static String viewing;
 	private static String orderOption;
-	private final static String GetStates = "SELECT state_name FROM state ORDER BY " + orderType; //+ "LIMIT 20 OFFSET " + rowNum
-	private final static String GetProducts = "SELECT product_name FROM product ORDER BY product_name LIMIT 20 OFFSET " + colNum;
-	private final static String GetPersons = "SELECT person_name FROM person ORDER BY " + orderType + "LIMIT 20 OFFSET " + rowNum;
+	private final static String GetStates = "SELECT state_name FROM state ORDER BY ? LIMIT 20 OFFSET ?";
+	private final static String GetProducts = "SELECT product_name FROM product ORDER BY product_name LIMIT 20 OFFSET ?";
+	private final static String GetPersons = "SELECT person_name FROM person ORDER BY ? LIMIT 20 OFFSET ?";
 	
     /**
      * @see HttpServlet#HttpServlet()
@@ -115,26 +117,20 @@ public class salesAnalyticController extends HttpServlet {
 			else if(orderOption != null && orderOption.equals("topk")){
 				orderType = "price";
 			}
-			System.out.println(orderType);
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
 			
 			try {
 				pstmt = con.prepareStatement(GetStates);
+				pstmt.setString(1, orderType);
+				pstmt.setInt(2, rowNum);
 				rs = pstmt.executeQuery();
 				
 				ArrayList<String> states = new ArrayList<String>();
 				while(rs.next()){
 					states.add(rs.getString("state_name"));
-					System.out.println("test");
 				}
-				
-				if(!states.isEmpty()){
-					return states;
-				}
-				else{
-					return null;
-				}
+				return states;
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
@@ -170,6 +166,8 @@ public class salesAnalyticController extends HttpServlet {
 			
 			try {
 				pstmt = con.prepareStatement(GetPersons);
+				pstmt.setString(1, orderType);
+				pstmt.setInt(2, rowNum);
 				rs = pstmt.executeQuery();
 				
 				ArrayList<String> people = new ArrayList<String>();
@@ -211,6 +209,7 @@ public class salesAnalyticController extends HttpServlet {
 		
 		try {
 			pstmt = con.prepareStatement(GetProducts);
+			pstmt.setInt(1, colNum);
 			rs = pstmt.executeQuery();
 			
 			ArrayList<String> products = new ArrayList<String>();
