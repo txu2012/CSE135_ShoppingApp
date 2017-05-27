@@ -18,6 +18,7 @@
 		<li><a href='productsearch.jsp'>Products Browsing</a></li>
 		<!-- <li><a href='#'>Product Order</a></li> -->
 		<li><a href='./BuyController'>Buy Shopping Cart</a></li>
+		<li><a href='salesAnalytics.jsp'>Sales Analytics</a></li>
 	<% } %>
 </ul>
 </body>
