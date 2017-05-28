@@ -56,9 +56,9 @@
 			%>	
 				<table border = '1'>
 					<tr>
-						<td>Product 1 </td>
-						<td>Product 2 </td>
-						<td>Cosine Similarity</td>
+						<td>Product 1  </td>
+						<td>Product 2  </td>
+						<td>Cosine Similarity </td>
 					</tr>
 					<% while(rs.next()) {%>
 					<tr>
