@@ -27,34 +27,25 @@
 			<tr><td valign="top"> <jsp:include page="./menu.jsp"></jsp:include></td></tr>
 		</table>
 		<form action="salesAnalyticController" method="POST">
-			<p>Select View By</p>
+			Select View By
 			<select name="viewing">
 				<option value="person">Customers</option>
 				<option value="state">States</option>
 			</select>
-			<p>Select Ordering Type</p>
+			<br>
+			Select Ordering Type
 			<select name="order">
 				<option value="alpha">Alphabetically</option>
 				<option value="topk">Top-K</option>
 			</select>
-			<label>
-					<input type="radio" name="category_id" value="-1" checked="checked">
-				all
-			</label>
-			<%
-			int checked = -1;
-			if (request.getAttribute("category_id") != null){
-				checked = Integer.parseInt(request.getAttribute("category_id").toString());
-			}
-			for (CategoryModel cat : category_list) {
-			%>
-				<label>
-					<input type="radio" name="category_id" value="<%=cat.getId()%>" <%if (cat.getId() == checked) { %>checked="checked" <%} %> >
-					<%=cat.getCategoryName()%>
-				</label>
-			<%
-			}
-			%>
+			<br>
+			Select Filtering
+			<select name="filter">
+				<option value="all">All</option>
+				<%for (CategoryModel cat : category_list) {%>
+				<option value="<%= cat.getCategoryName() %>"><%= cat.getCategoryName() %></option>
+				<% } %>
+			</select>
 			<input type="submit" value="Query" name="query">
 			
 		</form>
@@ -90,6 +81,19 @@
 								String StatePurchasesTotal = (String)request.getAttribute("statePurchases");
 								PreparedStatement pstmtTotal = con.prepareStatement(StatePurchasesTotal);
 								pstmtTotal.setString(1,s);
+								pstmtTotal.setInt(2,curCol);
+									
+								ResultSet rs = pstmtTotal.executeQuery();
+								total = 0;
+								while(rs.next()){
+									total = total + rs.getInt("pricetotal");
+								}
+							}
+							else if(request.getAttribute("custPurchases") != null){
+								String CustPurchasesTotal = (String)request.getAttribute("custPurchases");
+								PreparedStatement pstmtTotal = con.prepareStatement(CustPurchasesTotal);
+								pstmtTotal.setString(1,s);
+								pstmtTotal.setInt(2,curCol);
 									
 								ResultSet rs = pstmtTotal.executeQuery();
 								total = 0;
@@ -98,15 +102,16 @@
 								}
 							}
 							
+							
 					%>
 							<tr>
-								<td><%= s %> $<%= total %></td>
+								<td><%= s %> ($<%= total %>)</td>
 					<%
 							if(request.getAttribute("statePurchases") != null){
-								//System.out.println("check");
 								String StatePurchases = (String)request.getAttribute("statePurchases");
 								PreparedStatement pstmt = con.prepareStatement(StatePurchases);
 								pstmt.setString(1,s);
+								pstmt.setInt(2, curCol);
 									
 								ResultSet rs = pstmt.executeQuery();
 					%>
@@ -125,6 +130,7 @@
 								String CustPurchases = (String)request.getAttribute("custPurchases");
 								PreparedStatement pstmt = con.prepareStatement(CustPurchases);
 								pstmt.setString(1,s);
+								pstmt.setInt(2, curCol);
 									
 								ResultSet rs = pstmt.executeQuery();
 					%>
@@ -148,30 +154,36 @@
 			%>
 				<form method="GET" action="salesAnalyticController">
 					<input type="hidden" value="rowVals" name="rowVals">
-					<input type="hidden" value="<%= curRow = curRow + rows.size() %>" name="rowNum">
+					<input type="hidden" value="<%= curRow %>" name="rowNum">
 					<input type="submit" value="Next 20 rows" name="getAction">
-					<input type="hidden" value="<%= request.getAttribute("orderType") %>" name="orderType">
-					<input type="hidden" value="<%= request.getAttribute("viewing") %>" name="viewing">
+					<input type="hidden" value="<%= (String)request.getAttribute("orderType") %>" name="orderType">
+					<input type="hidden" value="<%= (String)request.getAttribute("viewing") %>" name="viewing">
 					<input type="hidden" value="<%= curCol %>" name="colNum">
 				</form>
 			
 			<%
 			}
-			if(cols.size() >= 20){
+			if(cols.size() >= 10){ System.out.println(curRow + "form");
 			%>
 				<form method="GET" action="salesAnalyticController">
 					<input type="hidden" value="colVals" name="colVals">
-					<input type="hidden" value="<%= curCol = curCol + cols.size() %>" name="colNum">
-					<input type="submit" value="Next 20 columns" name="getAction">
-					<input type="hidden" value="<%= request.getAttribute("orderType") %>" name="orderType">
-					<input type="hidden" value="<%= request.getAttribute("viewing") %>" name="viewing">
-					<input type="hidden" value="<%= rows %>" name="rows">
+					<input type="hidden" value="<%= curCol %>" name="colNum">
+					<input type="submit" value="Next 10 columns" name="getAction">
+					<input type="hidden" value="<%= (String)request.getAttribute("orderType") %>" name="orderType">
+					<input type="hidden" value="<%= (String)request.getAttribute("viewing") %>" name="viewing">
+					<input type="hidden" value="<%= curRow %>"name="rowNum">
 				</form>
 			
 			<%
 			}
-			}
 		}
-		%>
+		else { %>
+			<h3>This page is available to owners only</h3>
+		<%
+		}
+	}
+	else { %>
+			<h3>Please <a href = "./login.jsp">login</a> before viewing the page</h3>
+	<%} %>
 	</body>
 </html>
