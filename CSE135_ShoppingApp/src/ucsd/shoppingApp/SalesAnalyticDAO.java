@@ -111,10 +111,6 @@ public class SalesAnalyticDAO {
 		this.viewing = viewing;
 	}
 	
-	public SalesAnalyticDAO(Connection con){
-		this.con = con;
-	}
-	
 	public String getCustPurchases(){
 		return this.CustPurchases;
 	}
@@ -131,6 +127,7 @@ public class SalesAnalyticDAO {
 		return this.CustTopKProd;
 	}
 	
+	// Get an arraylist of the topk of the products
 	public ArrayList<String> getProdsTopK(String view, int num){
 		if(view.equals("person")){
 			PreparedStatement pstmt = null;
@@ -230,6 +227,7 @@ public class SalesAnalyticDAO {
 		return null;
 	}
 	
+	// Get an arraylist of the rows
 	public ArrayList<String> getRows(int row){
 		rowNum = row;
 		if(viewing != null && viewing.equals("state")){
@@ -339,6 +337,7 @@ public class SalesAnalyticDAO {
 		return null;
 	}
 	
+	// Get an arraylist of the columns
 	public ArrayList<String> getCols(int col){
 		colNum = col;
 		PreparedStatement pstmt = null;
@@ -378,99 +377,6 @@ public class SalesAnalyticDAO {
 				}
 			}
 		}
-		return null;
-	}
-	
-	public ArrayList<String> getNextRows(int curRow){
-		rowNum = curRow;
-		System.out.println(rowNum);
-		if(viewing != null && viewing.equals("state")){
-			if(orderOption != null && orderOption.equals("alpha")){
-				orderType = "state_name";
-				
-			}
-			else if(orderOption != null && orderOption.equals("topk")){
-				orderType = "price";
-			}
-			PreparedStatement pstmt = null;
-			ResultSet rs = null;
-			
-			try {
-				pstmt = con.prepareStatement(GetStates);
-				pstmt.setString(1, orderType);
-				pstmt.setInt(2, rowNum);
-				rs = pstmt.executeQuery();
-				ArrayList<String> states = new ArrayList<String>();
-				while(rs.next()){
-					states.add(rs.getString("state_name"));
-				}
-				tempRow = states;
-				return states;
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} finally {
-				if (rs != null) {
-					try {
-						rs.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
-				if (pstmt != null) {
-					try {
-						pstmt.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			
-		}
-		else if(viewing != null && viewing.equals("person")){
-			if(orderOption != null && orderOption.equals("alpha")){
-				orderType = "person_name";
-				
-			}
-			else if(orderOption != null && orderOption.equals("topk")){
-				orderType = "price";
-			}
-			
-			System.out.println(orderType);
-			PreparedStatement pstmt = null;
-			ResultSet rs = null;
-			
-			try {
-				pstmt = con.prepareStatement(GetPersons);
-				pstmt.setString(1, orderType);
-				pstmt.setInt(2, rowNum);
-				rs = pstmt.executeQuery();
-				
-				ArrayList<String> people = new ArrayList<String>();
-				while(rs.next()){
-					people.add(rs.getString("person_name"));
-				}
-				tempRow = people;
-				return people;
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} finally {
-				if (rs != null) {
-					try {
-						rs.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
-				if (pstmt != null) {
-					try {
-						pstmt.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		
 		return null;
 	}
 }

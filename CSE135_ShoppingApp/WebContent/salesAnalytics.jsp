@@ -13,15 +13,12 @@
 	</head>
 	<body>
 		<%
-		//Connection con = ConnectionManager.getConnection();	
 		if(session.getAttribute("roleName") != null) {
 			String role = session.getAttribute("roleName").toString();
 			if("owner".equalsIgnoreCase(role) == true){
 				Connection con = ConnectionManager.getConnection();	
 				CategoryDAO categoryDao = new CategoryDAO(con);
-				List<CategoryModel> category_list = categoryDao.getCategories();
-				//con.close();
-				
+				List<CategoryModel> category_list = categoryDao.getCategories();			
 		%>
 		<table>
 			<tr><td valign="top"> <jsp:include page="./menu.jsp"></jsp:include></td></tr>
@@ -88,6 +85,8 @@
 								while(rs.next()){
 									total = total + rs.getInt("pricetotal");
 								}
+								pstmtTotal.close();
+								rs.close();
 							}
 							else if(request.getAttribute("custPurchases") != null){
 								String CustPurchasesTotal = (String)request.getAttribute("custPurchases");
@@ -100,6 +99,8 @@
 								while(rs.next()){
 									total = total + rs.getInt("pricetotal");
 								}
+								pstmtTotal.close();
+								rs.close();
 							}
 							
 							
@@ -116,10 +117,15 @@
 								ResultSet rs = pstmt.executeQuery();
 					%>
 
-								<% while(rs.next()){ 
+								<% 
+									while(rs.next()){ 
 								%>
 									<td>$<%= rs.getInt("pricetotal") %></td>
-								<% } %>
+								<% 
+									}
+									pstmt.close();
+									rs.close();
+								%>
 							</tr>
 						
 					<%
@@ -135,17 +141,22 @@
 								ResultSet rs = pstmt.executeQuery();
 					%>
 
-								<% while(rs.next()){ 
+								<% 
+									while(rs.next()){ 
 								%>
 									<td>$<%= rs.getInt("pricetotal") %></td>
-								<% } %>
+								<% 
+									} 
+									pstmt.close();
+									rs.close();
+								%>
 							</tr>
 						
 					<%
 							}
 						}
+					con.close();
 					}
-				//}
 				%>
 		</table>
 		
@@ -153,12 +164,12 @@
 			if(rows.size() >= 20){
 			%>
 				<form method="GET" action="salesAnalyticController">
-					<input type="hidden" value="rowVals" name="rowVals">
 					<input type="hidden" value="<%= curRow %>" name="rowNum">
-					<input type="submit" value="Next 20 rows" name="getAction">
 					<input type="hidden" value="<%= (String)request.getAttribute("orderType") %>" name="orderType">
 					<input type="hidden" value="<%= (String)request.getAttribute("viewing") %>" name="viewing">
 					<input type="hidden" value="<%= curCol %>" name="colNum">
+					<input type="hidden" value="<%= (String)request.getAttribute("filter") %>" name="filter">
+					<input type="submit" value="Next 20 rows" name="getAction">
 				</form>
 			
 			<%
@@ -166,12 +177,12 @@
 			if(cols.size() >= 10){ System.out.println(curRow + "form");
 			%>
 				<form method="GET" action="salesAnalyticController">
-					<input type="hidden" value="colVals" name="colVals">
 					<input type="hidden" value="<%= curCol %>" name="colNum">
-					<input type="submit" value="Next 10 columns" name="getAction">
 					<input type="hidden" value="<%= (String)request.getAttribute("orderType") %>" name="orderType">
 					<input type="hidden" value="<%= (String)request.getAttribute("viewing") %>" name="viewing">
 					<input type="hidden" value="<%= curRow %>"name="rowNum">
+					<input type="hidden" value="<%= (String)request.getAttribute("filter") %>" name="filter">
+					<input type="submit" value="Next 10 columns" name="getAction">
 				</form>
 			
 			<%

@@ -43,6 +43,7 @@ public class salesAnalyticController extends HttpServlet {
 	private static String orderType;
 	private static String viewing;
 	private static String orderOption;
+	private static String filterOption;
 	private ArrayList<String> tempRow;
 	
     /**
@@ -76,42 +77,50 @@ public class salesAnalyticController extends HttpServlet {
 		sales = new SalesAnalyticDAO(con, (String)request.getParameter("orderType"), (String)request.getParameter("viewing"));
 
 		String getAction = (String)request.getParameter("getAction");
+		String getFilter = (String)request.getParameter("filter");
 		int curCol = 0;
 		int curRow = 0;
 		if(getAction.equals("Next 20 rows")){
-			curRow = Integer.parseInt((String)request.getParameter("rowNum")) + 20;
-			curCol = Integer.parseInt((String)request.getParameter("colNum"));
-			ArrayList<String> rowList = sales.getRows(curRow);
-			ArrayList<String> colList;
-			if(orderOption.equals("topk")){
-				colList = sales.getProdsTopK(viewing, curCol);
+			if(getFilter.equals("all")){
+				curRow = Integer.parseInt((String)request.getParameter("rowNum")) + 20;
+				curCol = Integer.parseInt((String)request.getParameter("colNum"));
+				ArrayList<String> rowList = sales.getRows(curRow);
+				ArrayList<String> colList;
+				if(orderOption.equals("topk")){
+					colList = sales.getProdsTopK(viewing, curCol);
+				}
+				else{
+					colList = sales.getCols(curCol);
+				}
+				request.setAttribute("rows", rowList);
+				request.setAttribute("cols", colList);
 			}
 			else{
-				colList = sales.getCols(curCol);
+				
 			}
-			request.setAttribute("rows", rowList);
-			request.setAttribute("cols", colList);
-			System.out.println("testRows");
 		}
 		else if(getAction.equals("Next 10 columns")){
-			curCol = Integer.parseInt((String)request.getParameter("colNum")) + 10;
-			curRow = Integer.parseInt((String)request.getParameter("rowNum"));
-			System.out.println(curRow + "Controller row");
-			System.out.println(curCol + "Controller");
-			ArrayList<String> rowList = sales.getRows(curRow);
-			ArrayList<String> colList;
-			if(orderOption.equals("topk")){
-				colList = sales.getProdsTopK(viewing, curCol);
+			if(getFilter.equals("all")){
+				curCol = Integer.parseInt((String)request.getParameter("colNum")) + 10;
+				curRow = Integer.parseInt((String)request.getParameter("rowNum"));
+				System.out.println(curRow + "Controller row");
+				System.out.println(curCol + "Controller");
+				ArrayList<String> rowList = sales.getRows(curRow);
+				ArrayList<String> colList;
+				if(orderOption.equals("topk")){
+					colList = sales.getProdsTopK(viewing, curCol);
+				}
+				else{
+					colList = sales.getCols(curCol);
+				}
+				request.setAttribute("rows", rowList);
+				request.setAttribute("cols", colList);
 			}
 			else{
-				colList = sales.getCols(curCol);
+				
 			}
-			request.setAttribute("rows", rowList);
-			request.setAttribute("cols", colList);
 		}
 		
-		request.setAttribute("orderType", (String)request.getParameter("orderType"));
-		request.setAttribute("viewing", (String)request.getParameter("viewing"));
 		if(viewing.equals("state")){
 			if(orderOption.equals("alpha")){
 				request.setAttribute("statePurchases", sales.getStatePurchases());
@@ -130,6 +139,9 @@ public class salesAnalyticController extends HttpServlet {
 		}
 		request.setAttribute("curCol", curCol);
 		request.setAttribute("curRow", curRow);
+		request.setAttribute("filter", (String)request.getParameter("filter"));
+		request.setAttribute("orderType", (String)request.getParameter("orderType"));
+		request.setAttribute("viewing", (String)request.getParameter("viewing"));
 		this.getServletContext().getRequestDispatcher("/salesAnalytics.jsp").forward(request, response);
 	}
 
@@ -142,11 +154,12 @@ public class salesAnalyticController extends HttpServlet {
 		response.setContentType("text/html");
 		viewing = request.getParameter("viewing");
 		orderOption = request.getParameter("order");
+		filterOption = request.getParameter("filter");
 		
 		sales = new SalesAnalyticDAO(con, orderOption, viewing);
-		
-		ArrayList<String> rowList = sales.getRows(0);
 		ArrayList<String> colList = new ArrayList<String>();
+		ArrayList<String> rowList = sales.getRows(0);
+		
 		if(orderOption.equals("topk")){
 			colList = sales.getProdsTopK(viewing, 0);
 		}
@@ -154,6 +167,7 @@ public class salesAnalyticController extends HttpServlet {
 			colList = sales.getCols(0);
 		}
 		
+		request.setAttribute("filter", filterOption);
 		request.setAttribute("orderType", orderType);
 		request.setAttribute("viewing", viewing);
 		request.setAttribute("rows", rowList);
