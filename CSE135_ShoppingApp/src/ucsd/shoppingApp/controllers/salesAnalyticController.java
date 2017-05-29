@@ -75,71 +75,92 @@ public class salesAnalyticController extends HttpServlet {
 		// TODO Auto-generated method stub
 		response.setContentType("text/html");
 		sales = new SalesAnalyticDAO(con, (String)request.getParameter("orderType"), (String)request.getParameter("viewing"));
+		System.out.println(request.getParameter("orderType"));
 
 		String getAction = (String)request.getParameter("getAction");
 		String getFilter = (String)request.getParameter("filter");
+		ArrayList<String> rowList;
+		ArrayList<String> colList;
 		int curCol = 0;
 		int curRow = 0;
 		if(getAction.equals("Next 20 rows")){
+			curRow = Integer.parseInt((String)request.getParameter("rowNum")) + 20;
+			curCol = Integer.parseInt((String)request.getParameter("colNum"));
 			if(getFilter.equals("all")){
-				curRow = Integer.parseInt((String)request.getParameter("rowNum")) + 20;
-				curCol = Integer.parseInt((String)request.getParameter("colNum"));
-				ArrayList<String> rowList = sales.getRows(curRow);
-				ArrayList<String> colList;
+				rowList = sales.getRows(curRow);
 				if(orderOption.equals("topk")){
 					colList = sales.getProdsTopK(viewing, curCol);
 				}
 				else{
 					colList = sales.getCols(curCol);
 				}
-				request.setAttribute("rows", rowList);
-				request.setAttribute("cols", colList);
 			}
 			else{
-				
+				rowList = sales.getRowsFilter(curRow, getFilter);
+				colList = sales.getColsFilter(curCol, getFilter);
 			}
+			request.setAttribute("rows", rowList);
+			request.setAttribute("cols", colList);
 		}
 		else if(getAction.equals("Next 10 columns")){
+			curCol = Integer.parseInt((String)request.getParameter("colNum")) + 10;
+			curRow = Integer.parseInt((String)request.getParameter("rowNum"));
 			if(getFilter.equals("all")){
-				curCol = Integer.parseInt((String)request.getParameter("colNum")) + 10;
-				curRow = Integer.parseInt((String)request.getParameter("rowNum"));
-				System.out.println(curRow + "Controller row");
-				System.out.println(curCol + "Controller");
-				ArrayList<String> rowList = sales.getRows(curRow);
-				ArrayList<String> colList;
+				rowList = sales.getRows(curRow);
 				if(orderOption.equals("topk")){
 					colList = sales.getProdsTopK(viewing, curCol);
 				}
 				else{
 					colList = sales.getCols(curCol);
 				}
-				request.setAttribute("rows", rowList);
-				request.setAttribute("cols", colList);
 			}
 			else{
-				
+				rowList = sales.getRowsFilter(curRow, getFilter);
+				colList = sales.getColsFilter(curCol, getFilter);
 			}
+			request.setAttribute("rows", rowList);
+			request.setAttribute("cols", colList);
 		}
 		
-		if(viewing.equals("state")){
-			if(orderOption.equals("alpha")){
-				request.setAttribute("statePurchases", sales.getStatePurchases());
+		if(getFilter.equals("all")){
+			if(viewing.equals("state")){
+				if(orderOption.equals("alpha")){
+					request.setAttribute("statePurchases", sales.getStatePurchases());
+				}
+				else if(orderOption.equals("topk")){
+					request.setAttribute("statePurchases", sales.getStateTopKProd());
+				}
 			}
-			else if(orderOption.equals("topk")){
-				request.setAttribute("statePurchases", sales.getStateTopKProd());
+			else{
+				if(orderOption.equals("alpha")){
+					request.setAttribute("custPurchases", sales.getCustPurchases());
+				}
+				else if(orderOption.equals("topk")){
+					request.setAttribute("custPurchases", sales.getCustTopKProd());
+				}
 			}
 		}
 		else{
-			if(orderOption.equals("alpha")){
-				request.setAttribute("custPurchases", sales.getCustPurchases());
+			if(viewing.equals("state")){
+				if(orderOption.equals("alpha")){
+					request.setAttribute("statePurchases", sales.getStateAlphaFilter());
+				}
+				else if(orderOption.equals("topk")){
+					request.setAttribute("statePurchases", sales.getStateTopKFilter());
+				}
 			}
-			else if(orderOption.equals("topk")){
-				request.setAttribute("custPurchases", sales.getCustTopKProd());
+			else{
+				if(orderOption.equals("alpha")){
+					request.setAttribute("custPurchases", sales.getCustAlphaFilter());
+				}
+				else if(orderOption.equals("topk")){
+					request.setAttribute("custPurchases", sales.getCustTopKFilter());
+				}
 			}
 		}
 		request.setAttribute("curCol", curCol);
 		request.setAttribute("curRow", curRow);
-		request.setAttribute("filter", (String)request.getParameter("filter"));
+		request.setAttribute("filter", getFilter);
 		request.setAttribute("orderType", (String)request.getParameter("orderType"));
 		request.setAttribute("viewing", (String)request.getParameter("viewing"));
 		this.getServletContext().getRequestDispatcher("/salesAnalytics.jsp").forward(request, response);
@@ -158,34 +179,61 @@ public class salesAnalyticController extends HttpServlet {
 		
 		sales = new SalesAnalyticDAO(con, orderOption, viewing);
 		ArrayList<String> colList = new ArrayList<String>();
-		ArrayList<String> rowList = sales.getRows(0);
+		ArrayList<String> rowList = new ArrayList<String>();
 		
-		if(orderOption.equals("topk")){
-			colList = sales.getProdsTopK(viewing, 0);
+		if(filterOption.equals("all")){
+			rowList = sales.getRows(0);
+			if(orderOption.equals("topk")){
+				colList = sales.getProdsTopK(viewing, 0);
+			}
+			else{
+				colList = sales.getCols(0);
+			}
 		}
 		else{
-			colList = sales.getCols(0);
+			rowList = sales.getRowsFilter(0, filterOption);
+			colList = sales.getColsFilter(0, filterOption);
 		}
 		
 		request.setAttribute("filter", filterOption);
-		request.setAttribute("orderType", orderType);
+		request.setAttribute("orderType", orderOption);
 		request.setAttribute("viewing", viewing);
 		request.setAttribute("rows", rowList);
 		request.setAttribute("cols", colList);
-		if(viewing.equals("state")){
-			if(orderOption.equals("alpha")){
-				request.setAttribute("statePurchases", sales.getStatePurchases());
+		if(filterOption.equals("all")){
+			if(viewing.equals("state")){
+				if(orderOption.equals("alpha")){
+					request.setAttribute("statePurchases", sales.getStatePurchases());
+				}
+				else if(orderOption.equals("topk")){
+					request.setAttribute("statePurchases", sales.getStateTopKProd());
+				}
 			}
-			else if(orderOption.equals("topk")){
-				request.setAttribute("statePurchases", sales.getStateTopKProd());
+			else{
+				if(orderOption.equals("alpha")){
+					request.setAttribute("custPurchases", sales.getCustPurchases());
+				}
+				else if(orderOption.equals("topk")){
+					request.setAttribute("custPurchases", sales.getCustTopKProd());
+				}
 			}
 		}
 		else{
-			if(orderOption.equals("alpha")){
-				request.setAttribute("custPurchases", sales.getCustPurchases());
+			if(viewing.equals("state")){
+				if(orderOption.equals("alpha")){
+					request.setAttribute("statePurchases", sales.getStateAlphaFilter());
+				}
+				else if(orderOption.equals("topk")){
+					request.setAttribute("statePurchases", sales.getStateTopKFilter());
+				}
 			}
-			else if(orderOption.equals("topk")){
-				request.setAttribute("custPurchases", sales.getCustTopKProd());
+			else{
+				if(orderOption.equals("alpha")){
+					request.setAttribute("custPurchases", sales.getCustAlphaFilter());
+				}
+				else if(orderOption.equals("topk")){
+					request.setAttribute("custPurchases", sales.getCustTopKFilter());
+				}
 			}
 		}
 		this.getServletContext().getRequestDispatcher("/salesAnalytics.jsp").forward(request, response);

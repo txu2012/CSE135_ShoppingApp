@@ -77,9 +77,16 @@
 							if(request.getAttribute("statePurchases") != null){
 								String StatePurchasesTotal = (String)request.getAttribute("statePurchases");
 								PreparedStatement pstmtTotal = con.prepareStatement(StatePurchasesTotal);
-								pstmtTotal.setString(1,s);
-								pstmtTotal.setInt(2,curCol);
-									
+								if(request.getAttribute("filter").equals("all")){
+									pstmtTotal.setString(1,s);
+									pstmtTotal.setInt(2,curCol);
+								}
+								else{
+									pstmtTotal.setString(1,s);
+									pstmtTotal.setString(2,(String)request.getAttribute("filter"));
+									pstmtTotal.setString(3,(String)request.getAttribute("filter"));
+									pstmtTotal.setInt(4,curCol);
+								}
 								ResultSet rs = pstmtTotal.executeQuery();
 								total = 0;
 								while(rs.next()){
@@ -91,8 +98,16 @@
 							else if(request.getAttribute("custPurchases") != null){
 								String CustPurchasesTotal = (String)request.getAttribute("custPurchases");
 								PreparedStatement pstmtTotal = con.prepareStatement(CustPurchasesTotal);
-								pstmtTotal.setString(1,s);
-								pstmtTotal.setInt(2,curCol);
+								if(request.getAttribute("filter").equals("all")){
+									pstmtTotal.setString(1,s);
+									pstmtTotal.setInt(2,curCol);
+								}
+								else{
+									pstmtTotal.setString(1,s);
+									pstmtTotal.setString(2,(String)request.getAttribute("filter"));
+									pstmtTotal.setString(3,(String)request.getAttribute("filter"));
+									pstmtTotal.setInt(4,curCol);
+								}
 									
 								ResultSet rs = pstmtTotal.executeQuery();
 								total = 0;
@@ -111,8 +126,16 @@
 							if(request.getAttribute("statePurchases") != null){
 								String StatePurchases = (String)request.getAttribute("statePurchases");
 								PreparedStatement pstmt = con.prepareStatement(StatePurchases);
-								pstmt.setString(1,s);
-								pstmt.setInt(2, curCol);
+								if(request.getAttribute("filter").equals("all")){
+									pstmt.setString(1,s);
+									pstmt.setInt(2,curCol);
+								}
+								else{
+									pstmt.setString(1,s);
+									pstmt.setString(2,(String)request.getAttribute("filter"));
+									pstmt.setString(3,(String)request.getAttribute("filter"));
+									pstmt.setInt(4,curCol);
+								}
 									
 								ResultSet rs = pstmt.executeQuery();
 					%>
@@ -135,8 +158,16 @@
 							else if(request.getAttribute("custPurchases") != null){
 								String CustPurchases = (String)request.getAttribute("custPurchases");
 								PreparedStatement pstmt = con.prepareStatement(CustPurchases);
-								pstmt.setString(1,s);
-								pstmt.setInt(2, curCol);
+								if(request.getAttribute("filter").equals("all")){
+									pstmt.setString(1,s);
+									pstmt.setInt(2,curCol);
+								}
+								else{
+									pstmt.setString(1,s);
+									pstmt.setString(2,(String)request.getAttribute("filter"));
+									pstmt.setString(3,(String)request.getAttribute("filter"));
+									pstmt.setInt(4,curCol);
+								}
 									
 								ResultSet rs = pstmt.executeQuery();
 					%>
