@@ -137,7 +137,9 @@ public class salesAnalyticController extends HttpServlet {
 				}
 				else if(orderOption.equals("topk")){
 					request.setAttribute("custPurchases", sales.getCustTopKProd());
+					
 				}
+				
 			}
 		}
 		else{
@@ -161,6 +163,7 @@ public class salesAnalyticController extends HttpServlet {
 		request.setAttribute("curCol", curCol);
 		request.setAttribute("curRow", curRow);
 		request.setAttribute("filter", getFilter);
+		request.setAttribute("prodTotal", sales.getProdTotal(getFilter));
 		request.setAttribute("orderType", (String)request.getParameter("orderType"));
 		request.setAttribute("viewing", (String)request.getParameter("viewing"));
 		this.getServletContext().getRequestDispatcher("/salesAnalytics.jsp").forward(request, response);
@@ -200,6 +203,7 @@ public class salesAnalyticController extends HttpServlet {
 		request.setAttribute("viewing", viewing);
 		request.setAttribute("rows", rowList);
 		request.setAttribute("cols", colList);
+		request.setAttribute("prodTotal", sales.getProdTotal(filterOption));
 		if(filterOption.equals("all")){
 			if(viewing.equals("state")){
 				if(orderOption.equals("alpha")){

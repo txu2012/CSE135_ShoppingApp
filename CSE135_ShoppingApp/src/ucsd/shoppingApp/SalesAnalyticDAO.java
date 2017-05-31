@@ -246,6 +246,192 @@ public class SalesAnalyticDAO {
 			+")foo "
 			+"group by foo.product_name "
 			+"order by pricetotal desc, product_name asc limit 10 offset ?";
+	
+	// Gets total of each product on top filter person
+	public final String prodTotalFilterPersonTopK = "with test as ("
+			+"select foo.person_name, sum(foo.total) as total from("
+			+"select person.person_name, sum(products_in_cart.quantity * products_in_cart.price)as total "
+			+"from person, shopping_cart,products_in_cart,category,product "
+			+"where person.id = shopping_cart.person_id and "
+			+"shopping_cart.id = products_in_cart.cart_id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.category_id = category.id and "
+			+"category_name = ? "
+			+"group by person.person_name "
+			+"union "
+			+"select person.person_name ,'0' as total from person)foo "
+			+"group by person_name "
+			+"order  by total desc "
+			+"limit 20 offset ?) "
+			+"select sum(foo.total) as pricetotal from( "
+			+"select test.person_name, sum (products_in_cart.price * products_in_cart.quantity) as total "
+			+"from test, product, shopping_cart,products_in_cart,person "
+			+"where shopping_cart.is_purchased = 'true' and "
+			+"shopping_cart.id = products_in_cart.cart_id and "
+			+"test.person_name = person.person_name and "
+			+"person.id = shopping_cart.person_id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.product_name = ? "
+			+"group by test.person_name)foo";
+	
+	public final String prodTotalFilterPersonAlpha = "with test as ("
+			+"select foo.person_name, sum(foo.total) as total from("
+			+"select person.person_name, 1 as total "
+			+"from person, shopping_cart,products_in_cart,category,product "
+			+"where person.id = shopping_cart.person_id and "
+			+"shopping_cart.id = products_in_cart.cart_id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.category_id = category.id and "
+			+"category_name = ? "
+			+"group by person.person_name "
+			+"union "
+			+"select person.person_name ,'0' as total from person)foo "
+			+"group by person_name "
+			+"order  by total desc, person_name asc "
+			+"limit 20 offset ?) "
+			+"select sum(foo.total) as pricetotal from("
+			+"select test.person_name, sum (products_in_cart.price * products_in_cart.quantity) as total "
+			+"from test, product, shopping_cart,products_in_cart,person "
+			+"where shopping_cart.is_purchased = 'true' and "
+			+"shopping_cart.id = products_in_cart.cart_id and "
+			+"test.person_name = person.person_name and "
+			+"person.id = shopping_cart.person_id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.product_name = ? "
+			+"group by test.person_name)foo";
+	
+	public final String prodTotalFilterStateTopK = "with test as("
+			+"select foo.state_name, sum(foo.total)as total from("
+			+"select state.state_name, sum(products_in_cart.quantity * products_in_cart.price)as total "
+			+"from state,person, shopping_cart,products_in_cart,product,category "
+			+"where person.id = shopping_cart.person_id and "
+			+"shopping_cart.id = products_in_cart.cart_id and " 
+			+"person.state_id = state.id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.category_id = category.id and "
+			+"category.category_name = ? "
+			+"group by state.state_name "
+			+"union "
+			+"select state.state_name, '0' from state)foo " 
+			+"group by foo.state_name "
+			+"order  by total desc "
+			+"limit 20 offset ?) "
+			+"select sum(foo.total) as pricetotal from("
+			+"select test.state_name, sum (products_in_cart.price * products_in_cart.quantity) as total "
+			+"from test, product, shopping_cart,products_in_cart,person,state "
+			+"where shopping_cart.is_purchased = 'true' and "
+			+"shopping_cart.id = products_in_cart.cart_id and " 
+			+"test.state_name = state.state_name and "
+			+"state.id = person.state_id and "
+			+"person.id = shopping_cart.person_id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.product_name = ? "
+			+"group by test.state_name)foo";
+	
+	public final String prodTotalFilterStateAlpha = "with test as ("
+			+"select foo.state_name, sum(foo.total)as total from("
+			+"select state.state_name, 1 as total "
+			+"from state,person, shopping_cart,products_in_cart,product,category "
+			+"where person.id = shopping_cart.person_id and "
+			+"shopping_cart.id = products_in_cart.cart_id and "
+			+"person.state_id = state.id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.category_id = category.id and "
+			+"category.category_name = ? "
+			+"group by state.state_name "
+			+"union "
+			+"select state.state_name, '0' from state)foo "
+			+"group by foo.state_name "
+			+"order  by total desc, state_name asc "
+			+"limit 20 offset ?) "
+			+"select sum(foo.total) as pricetotal from( "
+			+"select test.state_name, sum (products_in_cart.price * products_in_cart.quantity) as total "
+			+"from test, product, shopping_cart,products_in_cart,person,state "
+			+"where shopping_cart.is_purchased = 'true' and "
+			+"shopping_cart.id = products_in_cart.cart_id and "
+			+"test.state_name = state.state_name and "
+			+"state.id = person.state_id and "
+			+"person.id = shopping_cart.person_id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.product_name = ? "
+			+"group by test.state_name)foo";
+	
+	// No filter total product sales
+	public final String prodTotalPersonTopK = "with test as("
+			+"select foo.person_name, sum(foo.total) as total from("
+			+"select person.person_name, sum(products_in_cart.quantity * products_in_cart.price)as total from person, shopping_cart,products_in_cart "
+			+"where person.id = shopping_cart.person_id and "
+			+"shopping_cart.id = products_in_cart.cart_id "
+			+"group by person.person_name "
+			+"union "
+			+"select person.person_name, '0'from person)foo "
+			+"group by foo.person_name "
+			+"order  by total desc "
+			+"limit 20 offset ?) "
+			+"select sum(foo.total) as pricetotal from( "
+			+"select test.person_name, sum (products_in_cart.price * products_in_cart.quantity) as total "
+			+"from test, product, shopping_cart,products_in_cart,person "
+			+"where shopping_cart.is_purchased = 'true' and "
+			+"shopping_cart.id = products_in_cart.cart_id and "
+			+"test.person_name = person.person_name and "
+			+"person.id = shopping_cart.person_id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.product_name = ? "
+			+"group by test.person_name)foo";
+	
+	public final String prodTotalPersonAlpha = "with test as("
+			+"select person.person_name from person "
+			+"order by person.person_name limit 20 offset ? )"
+			+"select sum(foo.total) as pricetotal from("
+			+"select test.person_name, sum (products_in_cart.price * products_in_cart.quantity) as total "
+			+"from test, product, shopping_cart,products_in_cart,person "
+			+"where shopping_cart.is_purchased = 'true' and "
+			+"shopping_cart.id = products_in_cart.cart_id and " 
+			+"test.person_name = person.person_name and "
+			+"person.id = shopping_cart.person_id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.product_name = ? "
+			+"group by test.person_name)foo";
+	
+	public final String prodTotalStateTopK = "with test as ("
+			+"select foo.state_name, sum(foo.total) as total from("
+			+"select state.state_name, sum(products_in_cart.quantity * products_in_cart.price)as total from state,person, shopping_cart,products_in_cart "
+			+"where person.id = shopping_cart.person_id and "
+			+"shopping_cart.id = products_in_cart.cart_id and "
+			+"person.state_id = state.id "
+			+"group by state.state_name "  
+			+"union "
+			+"select state.state_name, '0' from state)foo "
+			+"group by foo.state_name "
+			+"order by total desc "
+			+"limit 20 offset ?)"
+			+"select sum(foo.total) as pricetotal from( "
+			+"select test.state_name, sum (products_in_cart.price * products_in_cart.quantity) as total "
+			+"from test, product, shopping_cart,products_in_cart,person,state "
+			+"where shopping_cart.is_purchased = 'true' and "
+			+"shopping_cart.id = products_in_cart.cart_id and " 
+			+"test.state_name = state.state_name and "
+			+"state.id = person.state_id and "
+			+"person.id = shopping_cart.person_id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.product_name = ? "
+			+"group by test.state_name)foo ";
+	
+	public final String prodTotalStateAlpha = "with test as ( "
+			+"select state.state_name from state "
+			+"order by state.state_name "
+			+"limit 20 offset ?) "
+			+"select sum(foo.total) as pricetotal from( "
+			+"select test.state_name, sum (products_in_cart.price * products_in_cart.quantity) as total "
+			+"from test, product, shopping_cart,products_in_cart,person,state "
+			+"where shopping_cart.is_purchased = 'true' and "
+			+"shopping_cart.id = products_in_cart.cart_id and "
+			+"test.state_name = state.state_name and "
+			+"state.id = person.state_id and "
+			+"person.id = shopping_cart.person_id and "
+			+"products_in_cart.product_id = product.id and "
+			+"product.product_name = ? "
+			+"group by test.state_name)foo";
 				
 	private Connection con;
 	
@@ -254,6 +440,48 @@ public class SalesAnalyticDAO {
 		this.orderOption = orderType;
 		this.viewing = viewing;
 	}
+	
+	public String getProdTotal(String filter){
+		if(filter.equals("all")){
+			if(this.viewing.equals("person")){
+				if(this.orderOption.equals("topk")){
+					return this.prodTotalPersonTopK;
+				}
+				else{
+					return this.prodTotalPersonAlpha;
+				}
+			}
+			else if(this.viewing.equals("state")){
+				if(this.orderOption.equals("topk")){
+					return this.prodTotalStateTopK;
+				}
+				else{
+					return this.prodTotalStateAlpha;
+				}
+			}
+		}
+		else{
+			if(this.viewing.equals("person")){
+				if(this.orderOption.equals("topk")){
+					return this.prodTotalFilterPersonTopK;
+				}
+				else{
+					return this.prodTotalFilterPersonAlpha;
+				}
+			}
+			else if(this.viewing.equals("state")){
+				if(this.orderOption.equals("topk")){
+					return this.prodTotalFilterStateTopK;
+				}
+				else{
+					return this.prodTotalFilterStateAlpha;
+				}
+			}
+		}
+		return null;
+	}
+	
+	
 	
 	public String getCustPurchases(){
 		return this.CustPurchases;

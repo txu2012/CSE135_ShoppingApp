@@ -67,15 +67,38 @@
 				<%
 					if(request.getAttribute("cols") != null){
 						cols = (ArrayList<String>) request.getAttribute("cols");
+						PreparedStatement prodTotalStmt = null;
+						ResultSet rs = null;
 						for(String c : cols){
+							String prodTotal = (String)request.getAttribute("prodTotal");
+							prodTotalStmt = con.prepareStatement(prodTotal);
+							if(request.getAttribute("filter").equals("all")){
+								prodTotalStmt.setInt(1, curRow);
+								prodTotalStmt.setString(2, c);
+							}
+							else{
+								prodTotalStmt.setString(1, (String)request.getAttribute("filter"));
+								prodTotalStmt.setInt(2, curRow);
+								prodTotalStmt.setString(3, c);
+							}
+							rs = prodTotalStmt.executeQuery();
+							total = 0;
+							if(rs.next()){
 				%>
-					<td><%= c %></td>
-				<% }} %>
+					<td><%= c %> ($<%= rs.getInt("pricetotal") %>)</td>
+				<% 		
+							}
+						}
+						prodTotalStmt.close();
+						rs.close();
+					} 
+				%>
 			</tr>
 					<% 
 						for(String s : rows){
 							if(request.getAttribute("statePurchases") != null){
-								String StatePurchasesTotal = (String)request.getAttribute("statePurchases");
+								
+								/*String StatePurchasesTotal = (String)request.getAttribute("statePurchases");
 								PreparedStatement pstmtTotal = con.prepareStatement(StatePurchasesTotal);
 								if(request.getAttribute("filter").equals("all")){
 									pstmtTotal.setString(1,s);
@@ -93,10 +116,34 @@
 									total = total + rs.getInt("pricetotal");
 								}
 								pstmtTotal.close();
-								rs.close();
+								rs.close();*/
+								String query = "select sum(products_in_cart.price * products_in_cart.quantity) as pricetotal "
+										+"from person, products_in_cart, shopping_cart, product, state "
+										+"where shopping_cart.id = products_in_cart.cart_id and "
+										+"shopping_cart.person_id = person.id and person.state_id = state.id and "
+										+"products_in_cart.product_id = product.id and "
+										+"product.product_name = ? and "
+										+"state.state_name = ? and "
+										+"shopping_cart.is_purchased = 'true'";
+								int count = 0;
+								total = 0;
+								while(count < cols.size()){ 
+									PreparedStatement pstmt2 = con.prepareStatement(query);	
+									pstmt2.setString(1, cols.get(count));
+									pstmt2.setString(2, s);
+									ResultSet rs2 = pstmt2.executeQuery();
+									if(rs2.next()){
+										total = total + rs2.getInt("pricetotal");
+									}
+									
+									count++;
+									pstmt2.close();
+									rs2.close();
+								}
+								
 							}
 							else if(request.getAttribute("custPurchases") != null){
-								String CustPurchasesTotal = (String)request.getAttribute("custPurchases");
+								/*String CustPurchasesTotal = (String)request.getAttribute("custPurchases");
 								PreparedStatement pstmtTotal = con.prepareStatement(CustPurchasesTotal);
 								if(request.getAttribute("filter").equals("all")){
 									pstmtTotal.setString(1,s);
@@ -115,7 +162,31 @@
 									total = total + rs.getInt("pricetotal");
 								}
 								pstmtTotal.close();
-								rs.close();
+								rs.close();*/
+								String query = "select sum(products_in_cart.price * products_in_cart.quantity) as pricetotal "
+										+"from person, products_in_cart, shopping_cart,product "
+										+"where shopping_cart.id = products_in_cart.cart_id and "
+										+"shopping_cart.person_id = person.id and "
+										+"products_in_cart.product_id = product.id and "
+										+"product.product_name = ? and "
+										+"person.person_name = ? and "
+										+"shopping_cart.is_purchased = 'true'";
+								
+								int count = 0;
+								total = 0;
+								while(count < cols.size()){ 
+									PreparedStatement pstmt2 = con.prepareStatement(query);	
+									pstmt2.setString(1, cols.get(count));
+									pstmt2.setString(2, s);
+									ResultSet rs2 = pstmt2.executeQuery();
+									if(rs2.next()){
+										total = total + rs2.getInt("pricetotal");
+									}
+									
+									count++;
+									pstmt2.close();
+									rs2.close();
+								}
 							}
 							
 							
@@ -124,30 +195,36 @@
 								<td><%= s %> ($<%= total %>)</td>
 					<%
 							if(request.getAttribute("statePurchases") != null){
-								String StatePurchases = (String)request.getAttribute("statePurchases");
-								PreparedStatement pstmt = con.prepareStatement(StatePurchases);
-								if(request.getAttribute("filter").equals("all")){
-									pstmt.setString(1,s);
-									pstmt.setInt(2,curCol);
-								}
-								else{
-									pstmt.setString(1,s);
-									pstmt.setString(2,(String)request.getAttribute("filter"));
-									pstmt.setString(3,(String)request.getAttribute("filter"));
-									pstmt.setInt(4,curCol);
-								}
-									
-								ResultSet rs = pstmt.executeQuery();
-					%>
-
-								<% 
-									while(rs.next()){ 
+								String query = "select sum(products_in_cart.price * products_in_cart.quantity) as pricetotal "
+										+"from person, products_in_cart, shopping_cart, product, state "
+										+"where shopping_cart.id = products_in_cart.cart_id and "
+										+"shopping_cart.person_id = person.id and person.state_id = state.id and "
+										+"products_in_cart.product_id = product.id and "
+										+"product.product_name = ? and "
+										+"state.state_name = ? and "
+										+"shopping_cart.is_purchased = 'true'";
+								
+								int count = 0;
+								while(count < cols.size()){ 
+									PreparedStatement pstmt2 = con.prepareStatement(query);	
+									pstmt2.setString(1, cols.get(count));
+									pstmt2.setString(2, s);
+									ResultSet rs2 = pstmt2.executeQuery();
+										
+									if(rs2.next()){
+										if(rs2.getInt("pricetotal") > 0){
 								%>
-									<td>$<%= rs.getInt("pricetotal") %></td>
+									<td>$<%= rs2.getInt("pricetotal") %></td>
 								<% 
+										}
+										else{
+										%>	<td>$0</td> <%
+										}
 									}
-									pstmt.close();
-									rs.close();
+									count++;
+									pstmt2.close();
+									rs2.close();
+								} 
 								%>
 							</tr>
 						
@@ -156,30 +233,36 @@
 							}
 					
 							else if(request.getAttribute("custPurchases") != null){
-								String CustPurchases = (String)request.getAttribute("custPurchases");
-								PreparedStatement pstmt = con.prepareStatement(CustPurchases);
-								if(request.getAttribute("filter").equals("all")){
-									pstmt.setString(1,s);
-									pstmt.setInt(2,curCol);
-								}
-								else{
-									pstmt.setString(1,s);
-									pstmt.setString(2,(String)request.getAttribute("filter"));
-									pstmt.setString(3,(String)request.getAttribute("filter"));
-									pstmt.setInt(4,curCol);
-								}
-									
-								ResultSet rs = pstmt.executeQuery();
-					%>
+								String query = "select sum(products_in_cart.price * products_in_cart.quantity) as pricetotal "
+										+"from person, products_in_cart, shopping_cart,product "
+										+"where shopping_cart.id = products_in_cart.cart_id and "
+										+"shopping_cart.person_id = person.id and "
+										+"products_in_cart.product_id = product.id and "
+										+"product.product_name = ? and "
+										+"person.person_name = ? and "
+										+"shopping_cart.is_purchased = 'true'";
 
-								<% 
-									while(rs.next()){ 
+								int count = 0;
+								while(count < cols.size()){ 
+									PreparedStatement pstmt2 = con.prepareStatement(query);	
+									pstmt2.setString(1, cols.get(count));
+									pstmt2.setString(2, s);
+									ResultSet rs2 = pstmt2.executeQuery();
+										
+									if(rs2.next()){
+										if(rs2.getInt("pricetotal") > 0){
 								%>
-									<td>$<%= rs.getInt("pricetotal") %></td>
+									<td>$<%= rs2.getInt("pricetotal") %></td>
 								<% 
-									} 
-									pstmt.close();
-									rs.close();
+										}
+										else{
+										%>	<td>$0</td> <%
+										}
+									}
+									count++;
+									pstmt2.close();
+									rs2.close();
+								} 
 								%>
 							</tr>
 						

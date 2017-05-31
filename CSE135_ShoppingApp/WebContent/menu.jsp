@@ -13,12 +13,13 @@
 		<% if(session.getAttribute("roleName").equals("Owner")) {
 			out.write("<li><a href='./CategoryController?action=listCategories'/>Categories</a></li>");
 			out.write("<li><a href='./product.jsp'/>Products</a></li>");
+			out.write("<li><a href='salesAnalytics.jsp'>Sales Analytics</a></li>");
 		}	
 		%>
 		<li><a href='productsearch.jsp'>Products Browsing</a></li>
 		<!-- <li><a href='#'>Product Order</a></li> -->
 		<li><a href='./BuyController'>Buy Shopping Cart</a></li>
-		<li><a href='salesAnalytics.jsp'>Sales Analytics</a></li>
+		<li><a href='SimilarPage.jsp'>Similar Products</a></li>
 	<% } %>
 </ul>
 </body>
