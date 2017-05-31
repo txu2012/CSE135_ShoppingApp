@@ -13,6 +13,7 @@
 	</head>
 	<body>
 		<%
+		long start = System.currentTimeMillis();
 		if(session.getAttribute("roleName") != null) {
 			String role = session.getAttribute("roleName").toString();
 			if("owner".equalsIgnoreCase(role) == true){
@@ -85,7 +86,7 @@
 							total = 0;
 							if(rs.next()){
 				%>
-					<td><%= c %> ($<%= rs.getInt("pricetotal") %>)</td>
+					<td><h3><%= c %></h3> ($<%= rs.getInt("pricetotal") %>)</td>
 				<% 		
 							}
 						}
@@ -97,26 +98,6 @@
 					<% 
 						for(String s : rows){
 							if(request.getAttribute("statePurchases") != null){
-								
-								/*String StatePurchasesTotal = (String)request.getAttribute("statePurchases");
-								PreparedStatement pstmtTotal = con.prepareStatement(StatePurchasesTotal);
-								if(request.getAttribute("filter").equals("all")){
-									pstmtTotal.setString(1,s);
-									pstmtTotal.setInt(2,curCol);
-								}
-								else{
-									pstmtTotal.setString(1,s);
-									pstmtTotal.setString(2,(String)request.getAttribute("filter"));
-									pstmtTotal.setString(3,(String)request.getAttribute("filter"));
-									pstmtTotal.setInt(4,curCol);
-								}
-								ResultSet rs = pstmtTotal.executeQuery();
-								total = 0;
-								while(rs.next()){
-									total = total + rs.getInt("pricetotal");
-								}
-								pstmtTotal.close();
-								rs.close();*/
 								String query = "select sum(products_in_cart.price * products_in_cart.quantity) as pricetotal "
 										+"from person, products_in_cart, shopping_cart, product, state "
 										+"where shopping_cart.id = products_in_cart.cart_id and "
@@ -143,26 +124,6 @@
 								
 							}
 							else if(request.getAttribute("custPurchases") != null){
-								/*String CustPurchasesTotal = (String)request.getAttribute("custPurchases");
-								PreparedStatement pstmtTotal = con.prepareStatement(CustPurchasesTotal);
-								if(request.getAttribute("filter").equals("all")){
-									pstmtTotal.setString(1,s);
-									pstmtTotal.setInt(2,curCol);
-								}
-								else{
-									pstmtTotal.setString(1,s);
-									pstmtTotal.setString(2,(String)request.getAttribute("filter"));
-									pstmtTotal.setString(3,(String)request.getAttribute("filter"));
-									pstmtTotal.setInt(4,curCol);
-								}
-									
-								ResultSet rs = pstmtTotal.executeQuery();
-								total = 0;
-								while(rs.next()){
-									total = total + rs.getInt("pricetotal");
-								}
-								pstmtTotal.close();
-								rs.close();*/
 								String query = "select sum(products_in_cart.price * products_in_cart.quantity) as pricetotal "
 										+"from person, products_in_cart, shopping_cart,product "
 										+"where shopping_cart.id = products_in_cart.cart_id and "
@@ -192,7 +153,7 @@
 							
 					%>
 							<tr>
-								<td><%= s %> ($<%= total %>)</td>
+								<td><h3><%= s %></h3> ($<%= total %>)</td>
 					<%
 							if(request.getAttribute("statePurchases") != null){
 								String query = "select sum(products_in_cart.price * products_in_cart.quantity) as pricetotal "
@@ -310,5 +271,10 @@
 	else { %>
 			<h3>Please <a href = "./login.jsp">login</a> before viewing the page</h3>
 	<%} %>
+	<% 
+		long end = System.currentTimeMillis();
+		long timeTaken = end - start; 
+		System.out.println(timeTaken + "ms time");
+	%>
 	</body>
 </html>
