@@ -1,0 +1,74 @@
+Tony Xu t2xu@ucsd.edu
+Roland Personius rpersoni@ucsd.edu
+
+For queries, we use the primary and foreign keys to gather the data and check between tables to grab the datas.
+In postgres the primary keys and foreign keys are created with indexed, so grabbing the id's of the data from the different
+tables are faster, however the indices are not shown to the user. Most of our queries checks using the primary keys and since the 
+primary keys and unique constraints are created with indices. The indices that would be important to have would be the id's, names or 
+products and users, category names, and the state names to grab the their data faster from the tables without having to check through 
+more data. 
+
+The JSP runtime for the smaller database averaged to about 150ms for all the different queries of about 50 sales, 25 users, 35 products, and 5 categories.
+The JSP runtime for the larger database averaged to about 20s for all the different queries with a size
+of 50,000 sales, 500 users, 10 categories, and 50,000 products.
+
+When the queries are ran individually on postgres, the queries run faster, but when run on the jsp files, they ran slower for the larger database as it runs some of the queries multiple times
+
+When querying in postgres individually:
+
+Smaller Dataabase:
+(GetPersonsTopK) users name in topk : 585ms
+(CustTopKProd) topk of the user product names: 370ms
+(GetPersons) users in alphabetic order: 573ms
+(GetProducts) products in alphabetic order: 386ms
+(FilterPersonTopKName) filter the users based on products topk: 452ms
+(FilterPersonTopKProd) filter the products topk for users: 378ms
+(FilterPersonAlphaName) filter the users based on products alphabetic order: 453ms
+(FilterPersonAlphaProd) filter the products alphabetic order for users:  637ms
+
+(GetStates) states in alphabetic: 380ms
+(GetStatesTopK) states in topk: 369ms
+(FilterStateTopKName) filter the states based on products topk: 450ms
+(FilterStateTopKProd) filter the products topk for states: 488ms
+(FilterStateAlphaName) filter the states based on products alphabetic order: 451ms
+(FilterStateAlphaProd) filter the products alphabetic order for states: 391ms
+
+total sales for entire product column(limited by 20 rows) queries
+(prodTotalFilterPersonTopK): 399ms
+(prodTotalFilterPersonAlpha): 388ms
+(prodTotalFilterStateTopK): 396ms
+(prodTotalFilterStateAlpha): 390ms
+(prodTotalPersonTopK): 395ms
+(prodTotalPersonAlpha): 373ms
+(prodTotalStateTopK): 430ms
+(prodTotalStateAlpha): 413ms
+total sales query for each product for each person/state: 407ms
+
+Larger Database:
+(GetPersons) users in alphabetic order: 497ms
+(GetProducts) products in alphabetic order: 375ms
+(GetPersonsTopK) users name in topk : 829ms
+(CustTopKProd) topk of the user product names: 627ms
+(FilterPersonTopKName) filter the users based on products topk: 561ms
+(FilterPersonTopKProd) filter the products topk for users: 648ms
+(FilterPersonAlphaName) filter the users based on products alphabetic order: 724ms
+(FilterPersonAlphaProd) filter the products alphabetic order for users:  611ms
+
+(GetStates) states in alphabetic: 380ms
+(GetStatesTopK) states in topk: 848ms
+(FilterStateTopKName) filter the states based on products topk: 656ms
+(FilterStateTopKProd) filter the products topk for states: 689ms
+(FilterStateAlphaName) filter the states based on products alphabetic order: 690ms
+(FilterStateAlphaProd) filter the products alphabetic order for states: 778ms
+
+total sales for entire product column(limited by 20 rows) queries
+(prodTotalFilterPersonTopK): 688ms
+(prodTotalFilterPersonAlpha): 664ms
+(prodTotalFilterStateTopK): 824ms
+(prodTotalFilterStateAlpha): 712ms
+(prodTotalPersonTopK): 780ms
+(prodTotalPersonAlpha): 575ms
+(prodTotalStateTopK): 744ms
+(prodTotalStateAlpha): 522ms
+
+total sales query for each product for each person/state: 610ms
