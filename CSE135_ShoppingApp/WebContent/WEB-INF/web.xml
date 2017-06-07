@@ -60,6 +60,14 @@
     <servlet-name>salesAnalyticController</servlet-name>
     <url-pattern>/salesAnalyticController</url-pattern>
   </servlet-mapping>
+   <servlet>
+    <servlet-name>NewSalesAnalyticsController</servlet-name>
+    <servlet-class>ucsd.shoppingApp.controllers.NewSalesAnalyticsController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>NewSalesAnalyticsController</servlet-name>
+    <url-pattern>/NewSalesAnalyticsController</url-pattern>
+  </servlet-mapping>
   <resource-ref>
     <description>DB Connection</description>
     <res-ref-name>jdbc/shoppingAppDB</res-ref-name>

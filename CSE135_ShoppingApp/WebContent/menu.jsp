@@ -14,6 +14,7 @@
 			out.write("<li><a href='./CategoryController?action=listCategories'/>Categories</a></li>");
 			out.write("<li><a href='./product.jsp'/>Products</a></li>");
 			out.write("<li><a href='salesAnalytics.jsp'>Sales Analytics</a></li>");
+			out.write("<li><a href='NewSalesAnalytics.jsp'>New Sales Analytics</a></li>");
 		}	
 		%>
 		<li><a href='productsearch.jsp'>Products Browsing</a></li>

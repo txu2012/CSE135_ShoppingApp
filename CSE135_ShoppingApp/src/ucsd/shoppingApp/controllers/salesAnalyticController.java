@@ -18,14 +18,7 @@ import java.util.ArrayList;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpSession;
 
-import ucsd.shoppingApp.CategoryDAO;
 import ucsd.shoppingApp.ConnectionManager;
-import ucsd.shoppingApp.PersonDAO;
-import ucsd.shoppingApp.ProductDAO;
-import ucsd.shoppingApp.ShoppingCartDAO;
-import ucsd.shoppingApp.models.CategoryModel;
-import ucsd.shoppingApp.models.ProductModel;
-import ucsd.shoppingApp.models.ShoppingCartModel;
 import ucsd.shoppingApp.SalesAnalyticDAO;
 
 /**
