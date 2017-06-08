@@ -5,11 +5,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.*;
 import java.util.*;
+import java.io.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.*;
 
 import ucsd.shoppingApp.ConnectionManager;
 
@@ -57,15 +59,69 @@ public class NewSalesAnalyticsController extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		//this.getServletContext().getRequestDispatcher("/NewSalesAnalytics.jsp").forward(request, response);
+		System.out.println("CheckJava");
+		String getLog = "SELECT * FROM log";
+		PreparedStatement count1 = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try{
+			count1 = con.prepareStatement(updateCounter1);
+			count1.executeUpdate();
+			
+			pstmt = con.prepareStatement(getLog);
+			rs = pstmt.executeQuery();
+			ArrayList<String> states = new ArrayList<String>();
+			ArrayList<String> products = new ArrayList<String>();
+			ArrayList<Integer> prices = new ArrayList<Integer>();
+			JSONArray array = new JSONArray();
+			int counter = 0;
+			String c = "";
+			while(rs.next()){
+				c = c + ", " + rs.getString("state_names") + ", " + rs.getString("product_names") + ", " + Integer.toString(rs.getInt("product_sums"));
+				
+				states.add(rs.getString("state_names"));
+				products.add(rs.getString("product_names"));
+				prices.add(rs.getInt("product_sums"));
+				//JSONObject obj = new JSONObject();
+				//obj.put("state",rs.getString("state_names"));
+				//obj.put("product", rs.getString("product_names"));
+				//obj.put("price", rs.getInt("product_sums"));
+				//array.put(obj);
+				counter++;
+			}
+			array.put(states);
+			array.put(products);
+			array.put(prices);
+			c = Integer.toString(counter) + c;
+			String s = Integer.toString(counter) + ", " + array.toString();
+			System.out.println(c);
+			response.setContentType("application/JSON");
+			//PrintWriter out = response.getWriter();
+			//out.println("test");
+			response.getWriter().write(c);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				count1.close();
+				pstmt.close();
+				rs.close();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//doGet(request, response);
 		String getFilter = request.getParameter("filter");

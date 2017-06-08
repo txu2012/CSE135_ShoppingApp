@@ -1,0 +1,36 @@
+
+<html>
+<head>
+<script type="text/javascript">
+function lastTimeFunction()
+{
+var xmlHttp;
+  xmlHttp=new XMLHttpRequest();
+
+  var responseHandler = function()
+   {
+    if(xmlHttp.readyState==4)
+     { document.getElementById("lastTime").innerHTML = "You last typed on " + xmlHttp.responseText; }
+   }
+
+  xmlHttp.onreadystatechange = responseHandler ;
+
+  xmlHttp.open("GET","date.jsp",true);
+  xmlHttp.send(null);
+}
+</script>
+</head>
+
+<body>
+
+
+Write your story here:
+<form name="myForm" action="nowhere" method="GET">
+<p>
+<textarea rows="10" cols="80" name="story" onkeyup="lastTimeFunction();"> </textarea>
+<p>
+<span id="lastTime">You have not typed anything in the above box yet</span>
+</form>
+
+</body>
+</html>
