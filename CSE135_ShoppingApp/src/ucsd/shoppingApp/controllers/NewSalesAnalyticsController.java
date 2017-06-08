@@ -40,8 +40,28 @@ public class NewSalesAnalyticsController extends HttpServlet {
 									"from category, product "+
 									"where category.id = product.category_id and category.category_name = ? "+
 									"group by category.category_name";
-	private final String updateCounter1 = "update counterone set counter = counter + 1";
 	private final String updateCounter2 = "update countertwo set counter = counter + 1";
+	
+	private final String getTopProd = "select distinct product_name, product_sum from precomp " +
+	                                "order by product_sum desc limit 50";
+	private final String getTopProdwithFilter = "select distinct product_name, product_sum from precomp where category_name = ? " +
+                                    "order by product_sum desc limit 50";
+	private final String insertOld = "insert into oldProd select distinct product_name, product_sum from precomp " +
+                                     "order by product_sum desc limit 50 ";
+	private final String insertOldWithFilter = "insert into oldProd select distinct product_name, product_sum from precomp where category_name = ? " +
+                                      "order by product_sum desc limit 50 ";
+	private final String deleteOld = "delete from oldProd";
+	
+	private final String getOld  = "select * from oldProd order by  product_sum desc";
+	
+	private final String getState = "select state_name from state";
+	
+	private final String deleteFilter = "delete from filt";
+	
+	private final String insertFilter = "insert into filt(filters) values(?)";
+	
+	private final String getFilt = "select filters from filt";
+	
 	public void init() {
 		con = ConnectionManager.getConnection();
 	}
@@ -62,46 +82,101 @@ public class NewSalesAnalyticsController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//this.getServletContext().getRequestDispatcher("/NewSalesAnalytics.jsp").forward(request, response);
-		System.out.println("CheckJava");
 		String getLog = "SELECT * FROM log";
+		String getFilter = "";
 		PreparedStatement count1 = null;
 		PreparedStatement pstmt = null;
+		PreparedStatement pstmt2 =null;
+		PreparedStatement pstmt3 = null;
+		PreparedStatement pstmt4 = null;
+		PreparedStatement pstmt5 = null;
+		ResultSet ors = null;
+		ResultSet prs = null;
 		ResultSet rs = null;
+		ResultSet ss = null;
+		ResultSet fs = null;
+		
 		try{
-			count1 = con.prepareStatement(updateCounter1);
-			count1.executeUpdate();
 			
 			pstmt = con.prepareStatement(getLog);
 			rs = pstmt.executeQuery();
-			ArrayList<String> states = new ArrayList<String>();
-			ArrayList<String> products = new ArrayList<String>();
-			ArrayList<Integer> prices = new ArrayList<Integer>();
+			
+			count1 = con.prepareStatement(updateCounter2);
+			count1.executeUpdate();
+			
+			pstmt5 = con.prepareStatement(getFilt);
+			fs = pstmt5.executeQuery();
+
+	
+			while(fs.next()){
+				getFilter = fs.getString("filters");
+			}
+			System.out.println(getFilter);
+			
+			if(getFilter != null && getFilter.equals("all")){
+				pstmt2 = con.prepareStatement(getTopProd);
+				
+			}
+			
+			else{
+				pstmt2 = con.prepareStatement(getTopProdwithFilter);
+				pstmt2.setString(1, getFilter);
+				
+			}
+			prs = pstmt2.executeQuery();
+			
+			pstmt3 = con.prepareStatement(getOld);
+			ors = pstmt3.executeQuery();
+			
+			pstmt4 = con.prepareStatement(getState);
+			ss = pstmt4.executeQuery();
+
+			ArrayList<String> TopProd = new ArrayList<String>();
+			
+			ArrayList<String> Oldproducts = new ArrayList<String>();
+			ArrayList<String> statelist= new ArrayList<String>();
+			while(ss.next()){
+				statelist.add(ss.getString("state_name"));
+			}
+			
+			while(ors.next()){
+				Oldproducts.add(ors.getString("product_name"));
+			}
+			
 			JSONArray array = new JSONArray();
+			
+			while(prs.next()){
+				TopProd.add(prs.getString("product_name"));
+			}
+			request.setAttribute("checkTop", TopProd);
+			
 			int counter = 0;
 			String c = "";
+			
+			String d = "";
+			
+			for(String s : TopProd)
+				d = s +","+ d;
+			
+			String e = "";
+			
+			for(String s : Oldproducts)
+				e = s +","+ e ;
+			
+			String f = "";
+			for(String s : statelist)
+				f = s + "," + f;
+			
 			while(rs.next()){
 				c = c + ", " + rs.getString("state_names") + ", " + rs.getString("product_names") + ", " + Integer.toString(rs.getInt("product_sums"));
-				
-				states.add(rs.getString("state_names"));
-				products.add(rs.getString("product_names"));
-				prices.add(rs.getInt("product_sums"));
-				//JSONObject obj = new JSONObject();
-				//obj.put("state",rs.getString("state_names"));
-				//obj.put("product", rs.getString("product_names"));
-				//obj.put("price", rs.getInt("product_sums"));
-				//array.put(obj);
+
 				counter++;
 			}
-			array.put(states);
-			array.put(products);
-			array.put(prices);
+
 			c = Integer.toString(counter) + c;
-			String s = Integer.toString(counter) + ", " + array.toString();
-			System.out.println(c);
-			response.setContentType("application/JSON");
-			//PrintWriter out = response.getWriter();
-			//out.println("test");
-			response.getWriter().write(c);
+			
+			String combine = c + "!" + d + "!" + e + "!" + f;
+			response.getWriter().write(combine);
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -111,6 +186,11 @@ public class NewSalesAnalyticsController extends HttpServlet {
 				count1.close();
 				pstmt.close();
 				rs.close();
+				pstmt2.close();
+				prs.close();
+				ors.close();
+				pstmt3.close();
+				
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -128,25 +208,47 @@ public class NewSalesAnalyticsController extends HttpServlet {
 		PreparedStatement pstmt = null;
 		PreparedStatement pstmt2 = null;
 		PreparedStatement pstmt3 = null;
+		PreparedStatement pstmt4 = null;
+		PreparedStatement pstmt5 = null;
+		PreparedStatement pstmt6 = null;
+		PreparedStatement pstmt7 = null;
 		ResultSet rs = null;
 		try{
 			con.setAutoCommit(false);
-			pstmt2 = con.prepareStatement(updateCounter1);
+
 			pstmt3 = con.prepareStatement(updateCounter2);
 			
-			pstmt2.executeUpdate();
+			
 			pstmt3.executeUpdate();
 			con.commit();
 			con.setAutoCommit(true);
 			
 			int catNum = 50;
 			
+			pstmt6 = con.prepareStatement(deleteFilter);
+			pstmt6.executeUpdate();
+			
+			
+			pstmt7 = con.prepareStatement(insertFilter);
+			pstmt7.setString(1, getFilter);
+			pstmt7.executeUpdate();
+			
+			
+			pstmt5 = con.prepareStatement(deleteOld);
+			pstmt5.executeUpdate();
+			
+			System.out.println(getFilter);
 			if(getFilter != null && getFilter.equals("all")){
 				pstmt = con.prepareStatement(getTable);
+				pstmt4 = con.prepareStatement(insertOld);
 			}
 			else{
 				pstmt = con.prepareStatement(getTableFilter);
 				pstmt.setString(1,getFilter);
+				
+				pstmt4 = con.prepareStatement(insertOldWithFilter);
+				pstmt4.setString(1, getFilter);
+				
 				
 				PreparedStatement catNumStmt = con.prepareStatement(getCatProdAmount);
 				catNumStmt.setString(1,getFilter);
@@ -162,7 +264,7 @@ public class NewSalesAnalyticsController extends HttpServlet {
 				catNumStmt.close();
 			}
 			rs = pstmt.executeQuery();
-			
+			pstmt4.executeUpdate();
 			int counter = 0;
 			int counterStates = 0;
 			ArrayList<String> states = new ArrayList<String>();
@@ -170,6 +272,7 @@ public class NewSalesAnalyticsController extends HttpServlet {
 			ArrayList<String> products = new ArrayList<String>();
 			ArrayList<Integer> productsTotal = new ArrayList<Integer>();
 			ArrayList<Integer> stateProdTotal = new ArrayList<Integer>();
+
 			
 			while(rs.next()){
 				if(rs.getInt("rn") == 1){
@@ -202,7 +305,8 @@ public class NewSalesAnalyticsController extends HttpServlet {
 			if (pstmt != null) {
 				try {
 					pstmt.close();
-					pstmt2.close();
+					pstmt4.close();
+					pstmt5.close();
 					pstmt3.close();
 				} catch (Exception e) {
 					e.printStackTrace();

@@ -43,11 +43,6 @@ select ts.state_id, s.state_name, tp.product_id, pr.product_name, (select cg.cat
 	inner join product pr ON tp.product_id = pr.id 
 	order by ts.state_order, tp.product_order
 
-create table log as
-select state.id, state.state_name, product.product_name,category.category_name , 0 as product_sum 
-from state,product,category
-where category.id = product.category_id;
-
 create table log(
 	state_names text,
 	product_names text,
@@ -142,4 +137,11 @@ execute procedure updateprecomp();
 insert into counterone values(0);
 insert into countertwo values(0);
 
+create table oldProd(
+	product_name text,
+	product_sum  double precision;
+)
 
+create table filt(
+    filters text
+    )

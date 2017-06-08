@@ -12,22 +12,53 @@
 		var test = "new";
 		function getRequest(){
 			var xmlHttp = new XMLHttpRequest();
-			xmlHttp.open("POST", "NewSalesAnalyticsController",true);
-			xmlHttp.send(null);
+			
+			xmlHttp.open("POST", "NewSalesAnalyticsController?filter=",true);
+			xmlHttp.send();
 			xmlHttp.onreadystatechange = function() {
 				if(xmlHttp.readyState == 4 && xmlHttp.status == 200){
+					var temp = document.cookie;
+					temp = temp.split(",");
+					
 					test = xmlHttp.responseText;
 					
-					//var array = JSON.parse('[' + test + ']');
-					var array = test.replace(/[\[\]\"]+/g, '');
+					var separate = test.split("!");
+					var refresh1 = separate[0];
+					
+					var newPr = separate[1];
+					var oldPr = separate[2];
+					var statel = separate[3];
+					
+					var newSplit = newPr.split(",");
+					
+					var oldSplit = oldPr.split(",");
+					var stateSplit = statel.split(",");
+					var result = [];
+					
+					var flag = false;
+			
+					for(var i = 0 ; i < oldSplit.length; i++){
+						flag = false;
+						for(var j = 0 ; j < newSplit.length; j++){
+							if(oldSplit[i] == newSplit[j]){
+								flag = true;
+							}
+							
+						}
+						if(flag == false){
+							result.push(oldSplit[i]);
+						}
+					}
+					
+					var array = refresh1.replace(/[\[\]\"]+/g, '');
 					array = array.replace(/\s/g, '');
 					array = array.split(",");
-					document.getElementById("demo").innerHTML = array[0];
 					
 					var amount = parseInt(array[0]);
 					var stateList = [];
 					var productList = [];
 					var priceList = [];
+					var tempList = [];
 
 					for(var i = 1; i < array.length; i++){
 						if(i % 3 === 1){
@@ -41,28 +72,41 @@
 						}
 					}
 					
-					document.getElementById("demo1").innerHTML = stateList;
-					document.getElementById("demo2").innerHTML = productList;
-					document.getElementById("demo3").innerHTML = priceList;
 					
-					for(var i = 0; i < states.length; i++){
-						var string = stateList[0]+"_"+productList[0]
-						document.getElementById(string).innerHTML = "'"+priceList[0];
-						document.getElementById("'"+stateList[0]+"_"+productList[0]+"'").style.color = "red";
-					}	
+					for(var x = 0; x < stateSplit.length; x++){
+						for(var y = 0 ; y < result.length; y++ ){
+							document.getElementById(result[y]).style.backgroundColor = "purple";
+							document.getElementById(stateSplit[x]+"_"+result[y]).style.backgroundColor = "purple";
+							
+						}
+					}
+
+					for(var i = 0; i < stateList.length; i++){
+						var priceChange = parseInt(priceList[i]) + parseInt(document.getElementById(stateList[i]+"_"+productList[i]).innerHTML);
+						var priceState = parseInt(priceList[i]) + parseInt(document.getElementById(stateList[i]).innerHTML);
+						
+						document.getElementById(stateList[i]+"_"+productList[i]).innerHTML = priceChange;
+						document.getElementById(stateList[i]+"_"+productList[i]).style.color = "red";
+						document.getElementById(stateList[i]).style.color = "red";
+						document.getElementById(productList[i]).style.color = "red";
+						tempList.push(stateList[i]+"_"+productList[i]);
+						tempList.push(stateList[i]);
+						tempList.push(productList[i]);
+					}			
+					
+					
+					document.cookie = tempList;
+					if(amount === 0){
+						for(var i = 0; i < temp.length; i++){
+							document.getElementById(temp[i]).style.color = "black";
+						}
+					}
 				}
 			}
 		}
 	</script>
-	<p id="demo"></p>
-	<p id="demo1"></p>
-	<p id="demo2"></p>
-	<p id="demo3"></p>
-	<button value="Refresh" onclick='getRequest()'>Refresh</button>
 	<body>
 		<%
-		//"http://localhost:8080/CSE135_ShoppingApp/NewSalesAnalyticsController"
-			long start = System.currentTimeMillis();
 			if(session.getAttribute("roleName") != null) {
 				String role = session.getAttribute("roleName").toString();
 				if("owner".equalsIgnoreCase(role) == true){
@@ -100,11 +144,10 @@
 			</select>
 			<input type="submit" value="Query" name="query">
 		</form>
-		
 				<% if(products != null) { %>
 		<table border="1">
 			<tr>
-				<td></td>
+				<td><button value="Refresh" onclick='getRequest()'>Refresh</button></td>
 					<%
 						while(counter < products.size()){
 					%>
@@ -114,6 +157,7 @@
 						}
 						counter = 0;
 					%>
+				<td><button value="Refresh" onclick='getRequest()'>Refresh</button></td>
 			</tr>
 					<%
 						while(counter < states.size()){
@@ -137,12 +181,12 @@
 					<%
 						}
 					%>
+				<td><button value="Refresh" onclick='getRequest()'>Refresh</button></td>
 		</table>
 		<%
 					}
 				}
 			}
 		%>
-		
 	</body>
 </html>
