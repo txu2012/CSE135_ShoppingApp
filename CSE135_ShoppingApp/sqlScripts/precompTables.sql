@@ -1,5 +1,3 @@
-create table counterone(
-counter int);
 
 create table countertwo(
 counter int);
@@ -51,61 +49,6 @@ create table log(
 );
 
 
-Create function updatelog() returns trigger as
-$body$
-	begin
-    	if(old.is_purchased = false and new.is_purchased = true)
-        then   
-        		CREATE TABLE temps as (select state.state_name, product.product_name, category.category_name, products_in_cart.price * products_in_cart.quantity as product_sum
-										from product,state,person,shopping_cart,products_in_cart,category
-										where shopping_cart.id = new.id and
-										shopping_cart.id = products_in_cart.cart_id and
-										shopping_cart.person_id = person.id and 
-										person.state_id = state.id and product.category_id = category.id and 
-										products_in_cart.product_id = product.id);
-				
-				INSERT INTO log
-				SELECT * from temps;
-				
-				drop table temps;
-               
-       end if;
-    return new;           
-    end;
-$body$
-language plpgsql;
-
-create trigger logtrigger
-before update on shopping_cart
-for each row
-execute procedure updatelog();
-
-
-Create function grouplog() returns trigger as
-$body$
-	begin 
-    create table temps as (select state_names, product_names, category_names, sum(product_sums)as product_sums
-                from log group by 
-                state_names, product_names, category_names);
-                
-    			delete from log;
-                insert into log
-                select * from temps;
-                drop table temps;
-    
-    return new;           
-    end;
-$body$
-language plpgsql;
-
-
-create trigger counter1trigger
-before update on counterone
-for each row
-execute procedure grouplog();
-
-
-
 Create function updateprecomp() returns trigger as
 $body$
 	begin 
@@ -134,7 +77,96 @@ before update on countertwo
 for each row
 execute procedure updateprecomp();
 
-insert into counterone values(0);
+Create function updatelog() returns trigger as
+$body$
+	begin
+   
+    		if(old.is_purchased = false and new.is_purchased = true)
+        	then   
+        			CREATE TABLE temps as (select state.state_name, product.product_name, category.category_name, products_in_cart.price * 										products_in_cart.quantity as product_sum
+										from product,state,person,shopping_cart,products_in_cart,category
+										where shopping_cart.id = new.id and
+										shopping_cart.id = products_in_cart.cart_id and
+										shopping_cart.person_id = person.id and 
+										person.state_id = state.id and product.category_id = category.id and 
+										products_in_cart.product_id = product.id);
+				
+				INSERT INTO log
+				SELECT * from temps;
+				
+				drop table temps;
+
+
+
+       				create table temps as (select state_names, product_names, category_names, sum(product_sums)as product_sums
+               			from log group by 
+              			state_names, product_names, category_names);
+                
+    				delete from log;
+                		insert into log
+              			select * from temps;
+			        drop table temps;
+
+               
+	       end if;
+     
+     
+       
+       
+    return new;           
+    end;
+$body$
+language plpgsql;
+
+create trigger logtrigger
+before update on shopping_cart
+for each row
+execute procedure updatelog();
+
+
+Create function updatelognorder() returns trigger as
+$body$
+	begin
+    		if((select shopping_cart.purchase_info from shopping_cart where new.cart_id = shopping_cart.id)= 'Buy N Orders Generated' )
+        	then   
+        			CREATE TABLE temps as (select state.state_name, product.product_name, category.category_name, new.price *new.quantity as product_sum
+										from product,state,person,shopping_cart,products_in_cart,category
+										where shopping_cart.id = new.cart_id and
+										shopping_cart.id = products_in_cart.cart_id and
+										shopping_cart.person_id = person.id and 
+										person.state_id = state.id and product.category_id = category.id and 
+										products_in_cart.product_id = product.id);
+				
+				INSERT INTO log
+				SELECT * from temps;
+				
+				drop table temps;
+
+
+
+       				create table temps as (select state_names, product_names, category_names, sum(product_sums)as product_sums
+               			from log group by 
+              			state_names, product_names, category_names);
+                
+    				delete from log;
+                		insert into log
+              			select * from temps;
+			        drop table temps;
+
+               
+	       end if;
+    
+    return new;           
+    end;
+$body$
+language plpgsql;
+
+create trigger logtriggernorder
+before insert on products_in_cart
+for each row
+execute procedure updatelognorder();
+
+
 insert into countertwo values(0);
 
 create table oldProd(
