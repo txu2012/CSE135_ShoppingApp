@@ -109,10 +109,7 @@ $body$
 
                
 	       end if;
-     
-     
-       
-       
+
     return new;           
     end;
 $body$
@@ -172,8 +169,8 @@ insert into countertwo values(0);
 create table oldProd(
 	product_name text,
 	product_sum  double precision;
-)
+);
 
 create table filt(
     filters text
-    )
+);
