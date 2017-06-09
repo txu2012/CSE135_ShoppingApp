@@ -11,7 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.*;
+//import org.json.*;
 
 import ucsd.shoppingApp.ConnectionManager;
 
@@ -142,7 +142,7 @@ public class NewSalesAnalyticsController extends HttpServlet {
 				Oldproducts.add(ors.getString("product_name"));
 			}
 			
-			JSONArray array = new JSONArray();
+			//JSONArray array = new JSONArray();
 			
 			while(prs.next()){
 				TopProd.add(prs.getString("product_name"));

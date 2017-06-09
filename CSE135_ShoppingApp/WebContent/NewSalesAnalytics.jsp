@@ -33,7 +33,7 @@
 					var oldSplit = oldPr.split(",");
 					var stateSplit = statel.split(",");
 					var result = [];
-					var result2 = [];
+				//	var result2 = [];
 					
 					var flag = false;
 			
@@ -49,6 +49,35 @@
 							result.push(oldSplit[i]);
 						}
 					}
+					document.getElementById("demo").innerHTML = stateSplit;
+
+					
+					for(var i = 0 ; i < newSplit.length; i++){
+						flag = false;
+						for(var j = 0 ; j < oldSplit.length; j++){
+							if(newSplit[i] == oldSplit[j]){
+								flag = true;
+							}
+							
+						}
+						if(flag == false){
+							result2.push(newSplit[i]);
+						}
+					}
+					if( result2.length != 0){
+						document.getElementById("demo").innerHTML = "The top 50 product have changed, the following are in the top 50 but not shown:" + result2;
+					}
+					
+					
+					
+					for(var x = 0; x < stateSplit.length; x++){
+						for(var y = 0 ; y < result.length; y++ ){
+							document.getElementById(result[y]).style.backgroundColor = "purple";
+							document.getElementById(stateSplit[x]+"_"+result[y]).style.backgroundColor = "purple";
+						}
+					}
+					
+					
 					
 					var array = refresh1.replace(/[\[\]\"]+/g, '');
 					array = array.replace(/\s/g, '');
@@ -72,30 +101,10 @@
 							priceList.push(parseInt(array[i]));
 						}
 					}
-					
-					for(var x = 0; x < stateSplit.length; x++){
-						for(var y = 0 ; y < result.length; y++ ){
-							document.getElementById(result[y]).style.backgroundColor = "purple";
-							document.getElementById(stateSplit[x]+"_"+result[y]).style.backgroundColor = "purple";
-						}
-					}
+
 				
-					for(var i = 0 ; i < newSplit.length; i++){
-						flag = false;
-						for(var j = 0 ; j < oldSplit.length; j++){
-							if(newSplit[i] == oldSplit[j]){
-								flag = true;
-							}
-							
-						}
-						if(flag == false){
-							result2.push(newSplit[i]);
-						}
-					}
-					//print result2 purple
-					alert("test");
-					document.getElementById("demo").innerHTML = "Products Not in top 50 anymore: " + result2;
-					
+				
+				
 					for(var i = 0; i < stateList.length; i++){
 						var myElem = document.getElementById(stateList[i]+"_"+productList[i])
 						if(myElem === null){
@@ -131,6 +140,7 @@
 			}
 		}
 	</script>
+	<p id="demo"></p>
 	
 	<body>
 		<%
