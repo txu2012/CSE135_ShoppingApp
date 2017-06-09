@@ -13,6 +13,7 @@
 	</head>
 	<body>
 		<%
+		System.out.println("test");
 		long start = System.currentTimeMillis();
 		if(session.getAttribute("roleName") != null) {
 			String role = session.getAttribute("roleName").toString();

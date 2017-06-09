@@ -111,7 +111,6 @@ public class NewSalesAnalyticsController extends HttpServlet {
 			while(fs.next()){
 				getFilter = fs.getString("filters");
 			}
-			System.out.println(getFilter);
 			
 			if(getFilter != null && getFilter.equals("all")){
 				pstmt2 = con.prepareStatement(getTopProd);

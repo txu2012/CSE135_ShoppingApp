@@ -15,6 +15,7 @@
 			<tr><td valign="top"> <jsp:include page="./menu.jsp"></jsp:include></td></tr>
 		</table>
 		<%
+		System.out.println("test");
 		 final String cosine_val = 
 				"with data as (select product.product_name as v , person.id as base, sum(products_in_cart.price * products_in_cart.quantity)as w_td " +
 						"from product, person, products_in_cart, shopping_cart "+

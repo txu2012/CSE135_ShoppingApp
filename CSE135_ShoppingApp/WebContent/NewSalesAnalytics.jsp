@@ -19,7 +19,6 @@
 				if(xmlHttp.readyState == 4 && xmlHttp.status == 200){
 					var temp = document.cookie;
 					temp = temp.split(",");
-					
 					test = xmlHttp.responseText;
 					
 					var separate = test.split("!");
@@ -34,6 +33,7 @@
 					var oldSplit = oldPr.split(",");
 					var stateSplit = statel.split(",");
 					var result = [];
+					var result2 = [];
 					
 					var flag = false;
 			
@@ -59,6 +59,7 @@
 					var productList = [];
 					var priceList = [];
 					var tempList = [];
+					var getColList = [];
 
 					for(var i = 1; i < array.length; i++){
 						if(i % 3 === 1){
@@ -72,26 +73,51 @@
 						}
 					}
 					
-					
 					for(var x = 0; x < stateSplit.length; x++){
 						for(var y = 0 ; y < result.length; y++ ){
 							document.getElementById(result[y]).style.backgroundColor = "purple";
 							document.getElementById(stateSplit[x]+"_"+result[y]).style.backgroundColor = "purple";
-							
 						}
 					}
-
+				
+					for(var i = 0 ; i < newSplit.length; i++){
+						flag = false;
+						for(var j = 0 ; j < oldSplit.length; j++){
+							if(newSplit[i] == oldSplit[j]){
+								flag = true;
+							}
+							
+						}
+						if(flag == false){
+							result2.push(newSplit[i]);
+						}
+					}
+					//print result2 purple
+					alert("test");
+					document.getElementById("demo").innerHTML = "Products Not in top 50 anymore: " + result2;
+					
 					for(var i = 0; i < stateList.length; i++){
-						var priceChange = parseInt(priceList[i]) + parseInt(document.getElementById(stateList[i]+"_"+productList[i]).innerHTML);
-						var priceState = parseInt(priceList[i]) + parseInt(document.getElementById(stateList[i]).innerHTML);
-						
-						document.getElementById(stateList[i]+"_"+productList[i]).innerHTML = priceChange;
-						document.getElementById(stateList[i]+"_"+productList[i]).style.color = "red";
-						document.getElementById(stateList[i]).style.color = "red";
-						document.getElementById(productList[i]).style.color = "red";
-						tempList.push(stateList[i]+"_"+productList[i]);
-						tempList.push(stateList[i]);
-						tempList.push(productList[i]);
+						var myElem = document.getElementById(stateList[i]+"_"+productList[i])
+						if(myElem === null){
+						}
+						else{
+							var stateTotalPrice = document.getElementById(stateList[i]+"_total").innerHTML;
+							var productTotalPrice = document.getElementById(productList[i]+"_total").innerHTML;
+							stateTotalPrice = stateTotalPrice.replace(/[($)]/g, ''); 
+							productTotalPrice = productTotalPrice.replace(/[($)]/g, '');
+							var priceChange = parseInt(priceList[i]) + parseInt(document.getElementById(stateList[i]+"_"+productList[i]).innerHTML);
+							var priceState = parseInt(priceList[i]) + parseInt(stateTotalPrice);
+							var priceProduct = parseInt(priceList[i]) + parseInt(productTotalPrice);
+							document.getElementById(stateList[i]+"_"+productList[i]).innerHTML = priceChange;
+							document.getElementById(stateList[i]+"_total").innerHTML = "($" + priceState + ")";
+							document.getElementById(productList[i]+"_total").innerHTML = "($" + priceProduct + ")";
+							document.getElementById(stateList[i]+"_"+productList[i]).style.color = "red";
+							document.getElementById(stateList[i]).style.color = "red";
+							document.getElementById(productList[i]).style.color = "red";
+							tempList.push(stateList[i]+"_"+productList[i]);
+							tempList.push(stateList[i]);
+							tempList.push(productList[i]);
+						}
 					}			
 					
 					
@@ -105,6 +131,7 @@
 			}
 		}
 	</script>
+	
 	<body>
 		<%
 			if(session.getAttribute("roleName") != null) {
@@ -134,6 +161,7 @@
 		<table>
 			<tr><td valign="top"> <jsp:include page="./menu.jsp"></jsp:include></td></tr>
 		</table>
+		<p id="demo"></p>
 		<form action="NewSalesAnalyticsController" method="GET">
 			Select Filtering
 			<select name="filter">
@@ -144,6 +172,8 @@
 			</select>
 			<input type="submit" value="Query" name="query">
 		</form>
+		
+		
 				<% if(products != null) { %>
 		<table border="1">
 			<tr>
@@ -151,7 +181,7 @@
 					<%
 						while(counter < products.size()){
 					%>
-				<td id="<%= products.get(counter) %>"><%= products.get(counter) %> ($<%= productsTotal.get(counter) %>)</td>
+				<td id="<%= products.get(counter) %>"><%= products.get(counter) %> <div id="<%= products.get(counter) %>_total">($<%= productsTotal.get(counter) %>)</div></td>
 					<%
 							counter++;
 						}
@@ -161,13 +191,15 @@
 			</tr>
 					<%
 						while(counter < states.size()){
+							String s = states.get(counter);
+							s = s.replaceAll("\\s+","");
 					%>
 				<tr>
-					<td id="<%= states.get(counter) %>"><%= states.get(counter) %> ($<%= statesTotal.get(counter) %>)</td>
+					<td id="<%= s %>"><%= states.get(counter) %> <div id="<%= s %>_total">($<%= statesTotal.get(counter) %>)</div></td>
 					
 							<% for(int i = counterTotal; i < (counterTotal + 50); i++){ %>
 							
-					<td id="<%= states.get(counter) %>_<%= products.get(counterProd) %>"><%= stateProdTotal.get(i) %></td>
+					<td id="<%= s %>_<%= products.get(counterProd) %>"><%= stateProdTotal.get(i) %></td>
 					
 							<% 
 									counterProd++;

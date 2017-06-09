@@ -39,7 +39,7 @@ select ts.state_id, s.state_name, tp.product_id, pr.product_name, (select cg.cat
 	ON ( tp.product_id = ot.product_id and ts.state_id = ot.state_id)
 	inner join state s ON ts.state_id = s.id
 	inner join product pr ON tp.product_id = pr.id 
-	order by ts.state_order, tp.product_order
+	order by ts.state_order, tp.product_order;
 
 create table log(
 	state_names text,
@@ -168,7 +168,7 @@ insert into countertwo values(0);
 
 create table oldProd(
 	product_name text,
-	product_sum  double precision;
+	product_sum  double precision
 );
 
 create table filt(
