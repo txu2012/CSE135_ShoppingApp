@@ -97,6 +97,27 @@
 						}
 					}			
 					
+					var result2 = [];
+					for(var i = 0 ; i < newSplit.length; i++){
+						flag = false;
+						for(var j = 0 ; j < oldSplit.length; j++){
+							if(newSplit[i] == oldSplit[j]){
+								flag = true;
+							}
+							
+						}
+						if(flag == false){
+							result2.push(newSplit[i]);
+						}
+					}
+
+					if(result2.length != 0){
+						document.getElementById("demo").innerHTML = "Products that are now in top 50: " + result2;
+					}
+					else{
+						document.getElementById("demo").innerHTML = "";
+					}
+					
 					for(var x = 0; x < stateSplit.length; x++){
 						for(var y = 0 ; y < result.length; y++ ){
 							document.getElementById(result[y]).style.backgroundColor = "purple";
