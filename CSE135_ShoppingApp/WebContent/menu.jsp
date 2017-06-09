@@ -22,6 +22,7 @@
 		<li><a href='./BuyController'>Buy Shopping Cart</a></li>
 		<li><a href='SimilarPage.jsp'>Similar Products</a></li>
 		<li><a href='buyOrders.jsp'>Buy Orders</a></li>
+		<li><a href='buyOrders1.jsp'>Buy Orders 1</a></li>
 	<% } %>
 </ul>
 </body>
